@@ -95,7 +95,7 @@ def visualize_embeddings(word, embedding, rotated_embedding, m):
 
     # Draw arcs for both rotations, ensuring they connect vectors
     draw_arc(first_orgi, k_0_1_rotated, arc_radius=0.3, color='green')
-    draw_arc(second_orgi, k_2_3_rotated, arc_radius=0.3, color='purple')
+    draw_arc(second_orgi, k_2_3_rotated, arc_radius=0.2, color='purple')
 
     # Set plot limits
     ax.set_xlim(-1.5, 1.5)
