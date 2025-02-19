@@ -1,6 +1,6 @@
 # Rotary Position Embedding Visualization
 
-![](https://storage.googleapis.com/mle-courses-prod/users/61b6fa1ba83a7e37c8309756/private-files/a642f280-edba-11ef-9acf-6f7079495a92-Screen_Shot_2025_02_18_at_12.38.51.png)
+![](https://storage.googleapis.com/mle-courses-prod/users/61b6fa1ba83a7e37c8309756/private-files/eecb53b0-eea2-11ef-8f58-eb809d9b5bd7-Screen_Shot_2025_02_19_at_16.21.10.png)
 
 This project is a **Streamlit** app that visualizes **Rotary Position Embeddings (ROPE)**, a technique used in Transformers to encode positional information more effectively.
 
