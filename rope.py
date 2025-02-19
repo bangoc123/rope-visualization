@@ -5,32 +5,50 @@ st.image("https://storage.googleapis.com/mle-courses-prod/users/61b6fa1ba83a7e37
 
 
 # Function to build the 2D rotation matrix
-def build_rotation_matrix(theta):
-    """Returns the 2D rotation matrix for angle theta."""
-    return np.array([[np.cos(theta), -np.sin(theta)],
-                     [np.sin(theta), np.cos(theta)]])
+# def build_rotation_matrix(theta):
+#     """Returns the 2D rotation matrix for angle theta."""
+#     return np.array([[np.cos(theta), -np.sin(theta)],
+#                      [np.sin(theta), np.cos(theta)]])
+
+def build_rotation_matrix(m, d):
+    assert d % 2 == 0, "Embedding dimension d must be even."
+    theta = [10000**(-2 * k / d) for k in range(d // 2)]
+    R = np.zeros((d, d))
+    for k in range(d // 2):
+        theta_k = m * theta[k]
+        rot_matrix = np.array([[np.cos(theta_k), -np.sin(theta_k)],
+                               [np.sin(theta_k), np.cos(theta_k)]])
+        R[2*k:2*k+2, 2*k:2*k+2] = rot_matrix
+    return R
+
 
 # Function to generate LaTeX for rotation matrix
-def generate_rotation_matrix_latex(theta):
+def generate_rotation_matrix_latex():
     """Generates LaTeX representation of the 2D rotation matrix with theta value."""
     latex_matrix = rf"""
     R(\theta) =
     \begin{{bmatrix}}
-    \cos({theta:.2f}) & -\sin({theta:.2f}) \\
-    \sin({theta:.2f}) & \cos({theta:.2f})
+    \cos(m\theta) & -\sin(m\theta) \\
+    \sin(m\theta) & \cos(m\theta)
     \end{{bmatrix}}
     """
     return latex_matrix
 
 
 # Function to apply Rotary Position Encoding (ROPE)
-def apply_rope(embedding, position, base_theta=0.45):
-    """Applies ROPE to the embedding based on position."""
+# def apply_rope(embedding, position, base_theta=0.2):
+#     """Applies ROPE to the embedding based on position."""
+#     rotated_embedding = embedding.copy()
+#     theta = position * base_theta
+#     for i in range(0, len(embedding) - 1, 2):  # Process in pairs
+#         R = build_rotation_matrix(theta)
+#         rotated_embedding[i:i+2] = R @ embedding[i:i+2]
+#     return rotated_embedding
+
+def apply_rope(embedding, position, d):
     rotated_embedding = embedding.copy()
-    theta = position * base_theta
-    for i in range(0, len(embedding) - 1, 2):  # Process in pairs
-        R = build_rotation_matrix(theta)
-        rotated_embedding[i:i+2] = R @ embedding[i:i+2]
+    R = build_rotation_matrix(position, d)
+    rotated_embedding = R @ embedding
     return rotated_embedding
 
 # Function to calculate the angle between vectors
@@ -118,11 +136,11 @@ st.markdown("### Rotary position embedding visualization")
 sentence = ["the", "cat", "sat", "on", "the", "mat"]
 embeddings = np.array([
     [0.1, 0.2, -0.3, -0.4],
-    [0.5, 0.6, -0.5, 0.5],  # Reference row
-    [0.3, 0.2, -0.3, 0.2],
+    [0.5, 0.6, 0.7, 0.8],  # Reference row
+    [-0.25,1.08,-0.52,0.91],
     [0.4, 0.3, -0.2, 0.8],
     [0.2, 0.5, -0.1, 0.3],
-    [0.7, 0.1, -0.3, 0.4]
+    [0.5, 0.6, 0.7, 0.8]
 ])
 
 # Use session state to store selected word position
@@ -139,17 +157,18 @@ for i, word in enumerate(sentence):
 selected_position = st.session_state.selected_position
 selected_word = sentence[selected_position]
 original_embedding = embeddings[selected_position]
-rotated_embedding = apply_rope(original_embedding, selected_position)
+d = original_embedding.shape[0]
+rotated_embedding = apply_rope(original_embedding, selected_position, d)
 
 
 
 # Compute theta for the selected position
-theta_value = selected_position * 1.2  # Base theta from the ROPE function
+# theta_value = selected_position * 1.2  # Base theta from the ROPE function
 
 # Display LaTeX matrix in Streamlit
 st.markdown("Rotation Matrix")
 
-st.latex(generate_rotation_matrix_latex(theta_value))
+st.latex(generate_rotation_matrix_latex())
 
 # Visualize embeddings
 visualize_embeddings(selected_word, original_embedding, rotated_embedding, selected_position)
